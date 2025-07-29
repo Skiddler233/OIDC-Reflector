@@ -10,7 +10,7 @@ import requests
 # Initialise Flask app
 app = Flask(__name__)
 dotenv.load_dotenv() # Load .env variables
-app.secret_key = os.getenv('APP_SESSION_SECRET') # Secret to hold session open
+app.secret_key = os.getenv('APP_SESSION_SECRET') # Secret to hold session open set what you like
 
 # .env variables
 CLIENT_ID = os.environ.get("CLIENT_ID") # Provided by OIDC Client
@@ -45,7 +45,7 @@ def login():
     nonce = str(uuid.uuid4())
     session['nonce'] = nonce
     redirect_uri = REDIRECT_URI
-    return oidc.authorize_redirect(redirect_uri, nonce=nonce) # authorise redirect to callback URL
+    return oidc.authorize_redirect(redirect_uri, nonce=nonce)
 
 # Decoder for ID Token
 def decode_id_token(id_token, jwks_uri):
@@ -55,7 +55,7 @@ def decode_id_token(id_token, jwks_uri):
     claims = jwt.decode(id_token, key_set)
     claims.validate()
 
-    return dict(claims) # Return claims within token in dictionary
+    return dict(claims)
 
 
 # Authenticate route - matches the REDIRECT URI - Callback URL
