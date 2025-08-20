@@ -70,28 +70,12 @@ def authenticate():
         return 'Missing nonce in session', 401
 
     oidc.parse_id_token(token, nonce=nonce)
-    userinfo = oidc.userinfo()
 
     id_token = token['id_token']
     jwks_uri = oidc.server_metadata['jwks_uri']
 
     decoded_token = decode_id_token(id_token, jwks_uri)
-
-    result = {
-        'decoded_token': decoded_token,
-        'userinfo': userinfo,
-    }
-    result_data = json.dumps(result, indent=4)
-
-    return  f"""
-       <h1>Login Result</h1>
-       <form action="/" method="get">
-           <button type="submit">Logout</button>
-       </form>
-       <pre>{result_data}</pre>
-       """
-
-
+    return render_template('results.html', data=decoded_token)
 
 
 if __name__ == '__main__':

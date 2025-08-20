@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+    <title>Reflector Results</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+     <div class="container">
+        <h1 class="heading-text">Reflector Results</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>OIDC Claim</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in data.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>
+                    {% if value is mapping %}
+                        <!-- Handle nested dict -->
+                        <table>
+                            {% for k, v in value.items() %}
+                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+                            {% endfor %}
+                        </table>
+                    {% elif value is iterable and value is not string %}
+                        <!-- Handle list -->
+                        <ul>
+                            {% for item in value %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        <a class="logout-btn" href="/">Logout</a>
+     </div>
+</body>
+</html>
