@@ -65,7 +65,7 @@ th, td {
 }
 
 th {
-    background: #e6f2ff; /* subtle light blue */
+    background: #e6f2ff;
     color: #333;
     font-weight: bold;
 }
@@ -75,5 +75,8 @@ td {
 }
 
 tr:hover td {
-    background: #f5faff; /* light hover effect */
+    background: #f5faff;
+}
+pre {
+    text-align: left;
 }

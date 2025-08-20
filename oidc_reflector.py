@@ -1,4 +1,6 @@
 import os
+from textwrap import indent
+
 from flask import Flask, jsonify, session, render_template
 import dotenv
 import jwt
@@ -9,6 +11,9 @@ import requests
 import json
 import logging
 import base64
+import re
+
+from markupsafe import Markup
 
 # Initialise Flask app
 app = Flask(__name__)
@@ -50,7 +55,7 @@ def login():
     redirect_uri = REDIRECT_URI
     return oidc.authorize_redirect(redirect_uri, nonce=nonce)
 
-# Decoder for ID Token
+# Decoder and validator for ID Token
 def decode_id_token(id_token, jwks_uri):
 
     jwks = requests.get(jwks_uri).json()
@@ -75,8 +80,17 @@ def authenticate():
     jwks_uri = oidc.server_metadata['jwks_uri']
 
     decoded_token = decode_id_token(id_token, jwks_uri)
+
     return render_template('results.html', data=decoded_token)
 
+@app.route('/unprotected')
+def unprotected():
+    with open('attributes.json', 'r') as f:
+        attributes = json.load(f)
+
+    attributes_json = json.dumps(attributes, indent=4, ensure_ascii=False)
+
+    return render_template('unprotected.html', data=Markup(attributes_json))
 
 if __name__ == '__main__':
     app.run(debug=True)
