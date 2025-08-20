@@ -6,6 +6,9 @@ from authlib.jose import jwt, JsonWebKey
 from authlib.integrations.flask_client import OAuth
 import uuid
 import requests
+import json
+import logging
+import base64
 
 # Initialise Flask app
 app = Flask(__name__)
@@ -28,7 +31,7 @@ oidc = oauth.register(
     server_metadata_url=DISCOVERY_URL,
     token_endpoint=TOKEN_ENDPOINT,
     client_kwargs={
-        'scope' : 'openid profile email', # Specify scope for token
+        'scope' : 'openid profile email org.cilogon.userinfo', # Specify scope for token
         'response_mode' : 'jwt' # OIDC response JWT
     }
 )
@@ -57,7 +60,6 @@ def decode_id_token(id_token, jwks_uri):
 
     return dict(claims)
 
-
 # Authenticate route - matches the REDIRECT URI - Callback URL
 @app.route('/authenticate')
 def authenticate():
@@ -75,10 +77,22 @@ def authenticate():
 
     decoded_token = decode_id_token(id_token, jwks_uri)
 
-    return jsonify({
-        'decoded_ID_token': decoded_token,
-        'userinfo': userinfo
-    })
+    result = {
+        'decoded_token': decoded_token,
+        'userinfo': userinfo,
+    }
+    result_data = json.dumps(result, indent=4)
+
+    return  f"""
+       <h1>Login Result</h1>
+       <form action="/" method="get">
+           <button type="submit">Logout</button>
+       </form>
+       <pre>{result_data}</pre>
+       """
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
