@@ -12,7 +12,6 @@ import json
 import logging
 import base64
 import re
-
 from markupsafe import Markup
 
 # Initialise Flask app
