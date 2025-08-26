@@ -1,46 +1,46 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Reflector Results</title>
+    <meta charset="UTF-8">
+    <title>OIDC Claims</title>
     <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
-     <div class="container">
-        <h1 class="heading-text">Reflector Results</h1>
+<div class="container">
+    <div class="heading-container">
+        <h2 class="heading-text">OIDC Claims</h2>
+        <a class="logout-btn" href="/">Logout</a>
+    </div>
 
     <table>
         <thead>
-            <tr>
-                <th>OIDC Claim</th>
-                <th>Value</th>
-            </tr>
+        <tr>
+            <th>Claim</th>
+            <th>Value</th>
+        </tr>
         </thead>
         <tbody>
-            {% for key, value in data.items() %}
-            <tr>
-                <td>{{ key }}</td>
-                <td>
-                    {% if value is mapping %}
-                        <table>
-                            {% for k, v in value.items() %}
-                            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
-                            {% endfor %}
-                        </table>
-                    {% elif value is iterable and value is not string %}
-                        <ul>
-                            {% for item in value %}
-                            <li>{{ item }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        {{ value }}
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
+        {% for key in claim_keys %}
+        {% set v = token.get(key) %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>
+                {% if v is mapping %}
+                <pre>{{ v | tojson(indent=2) }}</pre>
+                {% elif v is sequence and v is not string %}
+                <ul>
+                    {% for item in v %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                {{ v if v is not none and v != '' else 'no value' }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
-        <a class="logout-btn" href="/">Logout</a>
-     </div>
+</div>
 </body>
 </html>

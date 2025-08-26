@@ -1,18 +1,13 @@
 import os
-from textwrap import indent
-
-from flask import Flask, jsonify, session, render_template
+from flask import Flask, jsonify, session, render_template, abort
 import dotenv
 import jwt
 from authlib.jose import jwt, JsonWebKey
 from authlib.integrations.flask_client import OAuth
 import uuid
 import requests
-import json
-import logging
-import base64
-import re
-from markupsafe import Markup
+
+
 
 # Initialise Flask app
 app = Flask(__name__)
@@ -39,6 +34,19 @@ oidc = oauth.register(
         'response_mode' : 'jwt' # OIDC response JWT
     }
 )
+
+claim_keys = [
+    "sub", "email", "eppn", "eptid",  "family_name", "given_name",
+    "idp_name", "isMemberOf", "iss", "jti", "nonce", "auth_time",
+    "exp", "acr", "aud"
+]
+hidden = [
+    "eduperson_targeted_id", "aueduperson_shared_token",
+    "home_organization", "home_organization_type", "mobile",
+    "name","eduperson_affiliation", "eduperson_scoped_affiliation",
+    "nickname","organization_name", "idp_entityid", "OIDC_access_token",
+    "OIDC_access_token_expires", "cert_subject_dn", "uid"
+]
 
 # Home route
 @app.route('/')
@@ -69,9 +77,10 @@ def decode_id_token(id_token, jwks_uri):
 def authenticate():
     token = oidc.authorize_access_token()
 
-    nonce=session.pop('nonce', None)
-    if not nonce:
-        return 'Missing nonce in session', 401
+    nonce = session.get('nonce')
+    if nonce is None:
+        return "Missing nonce in session", 401
+    session.pop('nonce')
 
     oidc.parse_id_token(token, nonce=nonce)
 
@@ -80,16 +89,12 @@ def authenticate():
 
     decoded_token = decode_id_token(id_token, jwks_uri)
 
-    return render_template('results.html', data=decoded_token)
+    return render_template("results.html", claim_keys=claim_keys, token=decoded_token)
 
 @app.route('/unprotected')
 def unprotected():
-    with open('attributes.json', 'r') as f:
-        attributes = json.load(f)
 
-    attributes_json = json.dumps(attributes, indent=4, ensure_ascii=False)
-
-    return render_template('unprotected.html', data=Markup(attributes_json))
+    return render_template("results.html", claim_keys=claim_keys, token={})
 
 if __name__ == '__main__':
     app.run(debug=True)

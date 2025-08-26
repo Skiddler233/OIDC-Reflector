@@ -15,6 +15,12 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+.heading-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+}
 
 .heading-text,
 .logout-header {
@@ -51,7 +57,8 @@ body {
 table {
     border-collapse: separate;
     border-spacing: 0;
-    width: 80%;
+    width: 60%;
+    min-width: 600px;
     margin: 20px auto;
     background: white;
     border-radius: 12px;
